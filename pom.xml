@@ -4,19 +4,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>mp.cariaso</groupId>
-    <artifactId>spring-boot-maven</artifactId>
+    <artifactId>spring-boot-docker</artifactId>
     <version>0.0.1-${build.profile.id}</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
-    <name>Spring Boot Maven</name>
-    <description>Sample Configuration for Spring Boot and Maven profiles</description>
+    <name>Spring Boot Docker</name>
+    <description>Sample Configuration for Spring Boot, Maven and Docker build</description>
 
     <properties>
         <!-- Overrides the spring.version in the parent pom -->
         <spring.version>4.2.5.RELEASE</spring.version>
         <spring.boot.version>1.3.1.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
-        <spring.boot.goal>repackage</spring.boot.goal>
         <skip.integration.test>true</skip.integration.test>
     </properties>
 
@@ -75,16 +74,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
-                <configuration>
-                    <classifier>BOOT</classifier>
-                </configuration>
-                <executions>
+                <!--<configuration>
+                    <classifier>REPACK</classifier>
+                </configuration>-->
+                <!--<executions>
                     <execution>
                         <goals>
-                            <goal>${spring.boot.goal}</goal>
+                            <goal>repackage</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -92,6 +91,55 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <!-- DOCKER BUILD USING FABRIC8.IO -->
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.24.0</version>
+                <configuration>
+                    <verbose>true</verbose>
+                    <!--<dockerHost>tcp://localhost</dockerHost>-->
+                    <images>
+                        <image>
+                            <!-- Replace your-project-name -->
+                            <name>spring-boot-docker:${project.version}</name>
+                            <alias>spring-boot-docker</alias>
+                            <build>
+
+                                <!-- This is container image base. usually the OS used
+                                     If not provided, the Docker daemon will provide default
+                                     Docker for Mac default is: busybox
+                                -->
+                                <from>openjdk:8-jre-alpine</from>
+
+                                <!-- This is the same ENTRYPOINT used in a Dockerfile -->
+                                <entryPoint>
+                                    <exec>
+                                        <arg>java</arg>
+                                        <!-- This extra argument is so Tomcat can start faster due to lack of entropy -->
+                                        <arg>-Djava.security.egd=file:/dev/./urandom</arg>
+                                        <arg>-jar</arg>
+                                        <!-- ./maven/ is the dir in container where artifacts are copied into -->
+                                        <arg>/maven/${project.artifactId}-${project.version}.${project.packaging}</arg>
+                                    </exec>
+                                </entryPoint>
+
+                                <assembly>
+                                    <!-- This is a predefined assembly.xml that will only copy your final artifact to the Docker image -->
+                                    <descriptorRef>artifact</descriptorRef>
+                                </assembly>
+                            </build>
+                            <run>
+                                <ports>
+                                    <!-- host (docker server) port : docker image container port -->
+                                    <port>8091:8090</port>
+                                </ports>
+                            </run>
+                        </image>
+                    </images>
                 </configuration>
             </plugin>
 
