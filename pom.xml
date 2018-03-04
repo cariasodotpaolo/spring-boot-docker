@@ -108,11 +108,6 @@
                             <name>spring-boot-docker:${project.version}</name>
                             <alias>spring-boot-docker</alias>
                             <build>
-
-                                <!-- This is container image base. usually the OS used
-                                     If not provided, the Docker daemon will provide default
-                                     Docker for Mac default is: busybox
-                                -->
                                 <from>openjdk:8-jre-alpine</from>
 
                                 <!-- This is the same ENTRYPOINT used in a Dockerfile -->
