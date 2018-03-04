@@ -28,9 +28,9 @@ PREREQUISITE: Docker For Mac
 
 Check using MVC Controller. Browse the following URL:
 
-LOCAL profile - http://localhost:8080/spring-boot-maven-LOCAL/profiles/active
-DEV profile - http://localhost:8080/spring-boot-maven-DEV/profiles/active
-UAT profile - http://localhost:8080/spring-boot-maven-UAT/profiles/active
+LOCAL profile - http://localhost:8091/spring-boot-docker-LOCAL/profiles/active
+DEV profile - http://localhost:8091/spring-boot-docker-DEV/profiles/active
+UAT profile - http://localhost:8091/spring-boot-docker-UAT/profiles/active
 
 Note:
 - the context root name changes based on profile used to illustrate property value change.
